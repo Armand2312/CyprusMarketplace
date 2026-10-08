@@ -6,7 +6,7 @@ export async function POST(request) {
         // Retrieve request data
         const { name, email, password } = await request.json();
         if (!name || !email || !password) {
-            console.log(name, email, password);
+            //console.log(name, email, password);
             return Response.json({ error: "Failed to fetch name, email, or password" }, { status: 400 });
         }
 
