@@ -16,7 +16,7 @@ model User {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   store             Store?
-  sellerApplication SellerApplication?
+  sellerApplication SellerApplication? // Buradaki '?', her kullanıcın satıcı başvuru yapmak zorunda olmadığını gösterir.
 }
 
 model Store {
@@ -61,7 +61,7 @@ model Category {
   name        String    @unique
   slug        String    @unique
   description String?
-  isActive    Boolean   @default(true)
+  isActive    Boolean   @default(true) //Bir kategoriyi database'den tamamen silmeden yayından kaldırabilmenizi sağlar.
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -84,8 +84,8 @@ model SellerApplication {
   status          SellerApplicationStatus @default(PENDING)
   rejectionReason String?
 
-  applicantId String @unique
-  applicant   User   @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  applicantId String @unique // SQL'de, one-to-one ilişkinin foreign key tarafında 'UNIQUE' constraint bulunması gerekir.
+  applicant   User   @relation(fields: [applicantId], references: [id], onDelete: Cascade) // 'onDelete: Cascade' Kullanıcı silinirse ona bağlı satıcı başvurusu da silinir.
 
   reviewedAt DateTime?
   createdAt  DateTime  @default(now())

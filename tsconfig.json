@@ -1,3 +1,13 @@
+/** tsconfig ne yapıyor?
+* Hangi dosyalar compile edilecek?
+* Module sistemi ne?
+* Alias nedir?
+* Strict mode açık mı?
+* JSX nasıl compile edilecek?
+* Yani: TypeScript derleyicisinin(compiler) beyni.
+*/
+
+
 {
   "compilerOptions": {
     "target": "ES2017",

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ValidationError } from "../errors/ValidationError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { ConflictError } from "../errors/ConflictError";
-
+// Mutation (durum değiştiren) servisler.
 /**
  * Approves a pending seller application.
  *
@@ -12,6 +12,17 @@ import { ConflictError } from "../errors/ConflictError";
  * 3. Create a store for the applicant
  */
 
+/**
+
+API Route
+      ↓
+approveSellerApplication()
+      ↓
+Prisma transaction
+      ↓
+PostgreSQL
+
+ */
 export async function approveSellerApplication(applicationId) {
   if (!applicationId) {
     throw new ValidationError("Seller application ID is required.");
@@ -30,6 +41,7 @@ export async function approveSellerApplication(applicationId) {
     },
   });
 
+  // Business Rules!
   if (!application) {
     throw new NotFoundError("Seller application was not found.");
   }
@@ -146,7 +158,7 @@ export async function rejectSellerApplication(
     return rejectedApplication;
 }
 
-
+// Query(Okuma) Servisleri
 /**
  * Returns all pending seller application.
  * 

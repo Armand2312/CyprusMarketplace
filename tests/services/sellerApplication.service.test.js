@@ -46,6 +46,7 @@ describe("rejectSellerApplication", () => {
 
   it("should throw ValidationError when rejectionReason is empty", async () => {
     await expect(
+    // Burada özellikle '"  "' kullandık, çünkü serviste 'rejectionReason.trim().length === 0' kontrolü vardı.
       rejectSellerApplication("application-123", "  "),
     ).rejects.toMatchObject({
       name: "ValidationError",
@@ -86,7 +87,7 @@ describe("rejectSellerApplication", () => {
         /** Burada şunu test ediyoruz:
          * 
          * Servisimize "APPROVED" bir application geldiğinde bizim yazdığımız
-         * Business Logic onu reddetmeyi engelliyor mu?
+         * Business Logic onu reddetmeyi(REJECTED olmasını) engelliyor mu?
          * 
          */
         const approvedApplication = {
@@ -112,11 +113,14 @@ describe("rejectSellerApplication", () => {
         });
         // ASSERTION
         // Geçersiz durumda olan application için servisimiz yanlışlıkla database update yapmaya çalıştı mı?
+        // Aşağıdaki kodun anlamı: "prisma.sellerApplication.update" fonksiyonun hiç çağırılmamış olmasını beliyorum. Çünkü application zaten "APPROVED".
         expect(
             prisma.sellerApplication.update
         ).not.toHaveBeenCalled();
     });
 
+    // HAPPY PATH -> Sistemin beklenen girdilerle ve hata oluşmadan başarılı şekilde ilerlediği senaryodur.
+    // Geçerli bir PENDING başvuru reddedildiğinde servis gerçekten doğru database update işlemini hazırlıyor mu? 
     it("should reject a pending seller application successfully", async () => {
         const pendingApplication = {
             id: "application-123",

@@ -28,6 +28,7 @@ export function handleApiError(error) {
     // 'error instanceof AppError' -> hatanın bizim oluşturduğumuz custom error ailesinden gelip gelmediğini kontrol eder.
     // Şunların tamamı 'AppError' sınıfından türediği için bu koşulu sağlar: ValidationError, NotFoundError, ConflictError
     if(error instanceof AppError && error.isOperational) {
+      // 'error.isOperational' -> hatanın beklenen ve kontrollü bir uygulama hatası olduğunu doğrular.
         return NextResponse.json(
             {
               success: false,

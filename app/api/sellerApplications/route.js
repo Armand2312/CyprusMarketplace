@@ -1,3 +1,5 @@
+import { prisma } from "@/lib/prisma";
+
 export async function GET() {
     try {
         const sellerApplications = await prisma.sellerApplication.findMany({
