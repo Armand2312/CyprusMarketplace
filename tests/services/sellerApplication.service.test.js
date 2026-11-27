@@ -158,6 +158,7 @@ describe("rejectSellerApplication", () => {
         expect(prisma.sellerApplication.update).toHaveBeenCalledWith({
             where: {
                 id: "application-123",
+                status: "PENDING",
             },
             data: {
                status: "REJECTED",
@@ -167,6 +168,23 @@ describe("rejectSellerApplication", () => {
         });        
     });
 });
+
+
+    it("returns a conflict if the application changes before the update", async() => {
+        prisma.sellerApplication.findUnique.mockResolvedValueOnce({
+            id: "application-123",
+            status: "PENDING",
+        });
+
+        prisma.sellerApplication.update.mockRejectedValueOnce({ code: "P2025" });
+
+        await expect(
+            rejectSellerApplication("application-123", "Missing business documents."),
+        ).rejects.toMatchObject({
+            name: "ConflictError",
+            statusCode: 409,
+        });
+    })
 
 // approveSellerApplication() ve $transaction mocking
 
@@ -343,6 +361,7 @@ describe("approveSellerApplication", () => {
             expect(tx.sellerApplication.update).toHaveBeenCalledWith({
                 where: {
                     id: "application-123",
+                    status: "PENDING",
                 },
 
                 data: {

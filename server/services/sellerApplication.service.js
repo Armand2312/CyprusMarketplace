@@ -61,13 +61,22 @@ export async function approveSellerApplication(applicationId) {
     const approvedApplication = await tx.sellerApplication.update({
       where: {
         id: application.id,
+        status: "PENDING",
       },
       data: {
         status: "APPROVED",
         rejectionReason: null,
         reviewedAt: new Date(),
       },
-    });
+    })
+    // Prisma Error Cheat Sheet: P2025 Error Code states that required record could not found. 
+    .catch((error) => {
+      if(error?.code === "P2025") {
+        throw new ConflictError("The application is no longer pending!")
+      }
+
+      throw error;
+    })
 
     const updatedUser = await tx.user.update({
       where: {
@@ -142,10 +151,12 @@ export async function rejectSellerApplication(
     throw new ConflictError("Only pending seller applications can be rejected.");
   }
 
-  const rejectedApplication =
-    await prisma.sellerApplication.update({
+  try {
+    return await prisma.sellerApplication.update({
       where: {
         id: application.id,
+        status: "PENDING", //This line makes Prisma check that the application is still pending 'when it writes'.
+        // If another request has already reviewed it, the update finds no matching row and the service returns a conflict.
       },
 
       data: {
@@ -154,8 +165,14 @@ export async function rejectSellerApplication(
         reviewedAt: new Date(),
       },
     });
+  } catch (error) {
+    if(error?.code === "P2025") {
+      throw new ConflictError("The application is no longer available for review.");
+    }
+  }
 
-    return rejectedApplication;
+  throw error;
+
 }
 
 // Query(Okuma) Servisleri
